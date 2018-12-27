@@ -6,12 +6,16 @@ import Registrate from './Registrate';
 import User from './User';
 
 const Main = props => {
-    const {onLogin, user} = props;
+    const {onLogin, user, onSubmitRegistrateForm, setErrorMessage} = props;
     return (
         <main>
             <Switch>
-                <Route path='/login' exact render={props => <Login {...props} onLogin={onLogin}/>}/>
-                <Route path='/registrate' exact component={Registrate}/>
+                <Route path='/login' render={props => <Login {...props} onLogin={onLogin}/>}/>
+                <Route path='/registrate' render={props =>
+                    <Registrate {...props}
+                        onSubmitRegistrateForm={onSubmitRegistrateForm}
+                        setErrorMessage={setErrorMessage}/>
+                }/>
                 <Route path='/user' render={props => <User {...props} user={user}/>}/>
             </Switch>
         </main>

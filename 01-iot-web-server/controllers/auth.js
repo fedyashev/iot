@@ -5,8 +5,8 @@ const User = require('../models/User');
 const Session = require('../models/Session');
 
 module.exports.registrate = (req, res, next) => {
-    const {login, password, email} = req.body;
-    const query = {$or: [ {username: login}, {email: email} ]};
+    const {username, password, email} = req.body;
+    const query = {$or: [ {username: username}, {email: email} ]};
     User.find(query)
         .then(users => {
             if (users.length > 0) {
@@ -21,9 +21,9 @@ module.exports.registrate = (req, res, next) => {
                         next(createError(500, 'Password crypt error'));
                     }
                     const newUser = {
-                        username: login,
+                        username,
                         passwordHash: hash,
-                        email: email
+                        email
                     };
                     User.create(newUser)
                         .then(user => {
