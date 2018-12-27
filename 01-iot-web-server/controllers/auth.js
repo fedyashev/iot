@@ -41,10 +41,10 @@ module.exports.registrate = (req, res, next) => {
 };
 
 module.exports.login = (req, res, next) => {
-    const {login, password} = req.body;
+    const {username, password} = req.body;
     //const loginError = {error: 'Incorrect login or password'};
     const loginError = new Error('Incorrect login or password');
-    User.findOne({username: login})
+    User.findOne({username})
         .then(user => {
             comparePassword(password, user.passwordHash, (err, isPasswordMatch) => {
                 if (err) {
@@ -83,22 +83,22 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.logout = (req, res, next) => {
-    const {user_id} = req.body;
-    Session.findOne({user_id: user_id})
+    const {user_id, session_token} = req.body;
+    Session.findOne({user_id, session_token})
         .then(session => {
             if (session) {
-                Session.deleteOne({user_id: user_id})
+                Session.deleteOne({user_id, session_token})
                     .then(session => {
                         res.json({
                             user_id: user_id,
                             session_token: null
                         });
                     })
-                    .catch(err => res.status(500).json(err));
+                    .catch(err => next(createError(500, err.message)));
             }
             else {
-                res.status(404).json({error: 'Session not found'});
+                next(createError(404, 'User and session not found'));
             }
         })
-        .catch(err => res.status(500).json(err));
+        .catch(err => next(createError(500, err.message)));
 };

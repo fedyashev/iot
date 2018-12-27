@@ -3,7 +3,7 @@ const createError = require('http-errors');
 const shortid = require('shortid');
 
 module.exports.isUserLogged = (req, res, next) => {
-    const user_id = req.params.user_id;
+    const user_id = req.params.user_id || req.body.user_id;
     const session_token = req.query.session_token || req.body.session_token;
 
     if (!shortid.isValid(user_id) || !shortid.isValid(session_token)) {

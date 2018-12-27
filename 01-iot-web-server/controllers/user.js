@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Device = require('../models/Device');
 
+const createError = require('http-errors');
+
 module.exports.getUserById = (req, res, next) => {
     const user_id = req.params.user_id;
     User.findOne({_id: user_id})
@@ -13,15 +15,15 @@ module.exports.getUserById = (req, res, next) => {
         .then(user => {
             if (user) {
                 //console.log(user);
-                const {username, email, data_token, devices} = user;
-                const resObj = {username, email, data_token, devices};
+                const {_id, username, email, data_token, devices} = user;
+                const resObj = {_id, username, email, data_token, devices};
                 res.json(resObj);
             }
             else {
                 res.status(404).json({error: 'User not found.'});
             }
         })
-        .catch(err => res.status(500).json(err));
+        .catch(err => next(createError(500, err.message)));
 };
 
 module.exports.getDeviceList = (req, res, next) => {

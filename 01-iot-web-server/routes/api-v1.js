@@ -20,7 +20,7 @@ router.post('/auth/login', auth.login);
 
 // /api/v1/auth/logout
 //      POST    - logout
-router.post('/auth/logout', auth.logout);
+router.post('/auth/logout', session.isUserLogged, auth.logout);
 
 // /api/v1/auth/changePassword
 //      POST    - change password
