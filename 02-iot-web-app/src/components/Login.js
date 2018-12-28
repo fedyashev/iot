@@ -9,7 +9,7 @@ const Login = props => {
     };
     return (
         <div className="row justify-content-center">
-            <div className='col-6'>
+            <div className='col-sm-12 col-md-8 col-lg-6 col-lx-4'>
                 <form className="bg-light border rounded p-3" onSubmit={onFormSubmit}>
                     <div className="form-group">
                         <label htmlFor="usernameInput">Username</label>

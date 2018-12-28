@@ -67,7 +67,28 @@ class App extends Component {
           this.props.history.push('/login');
         })
       })
-      .catch(err => this.setState({message: err.message}));
+      .catch(err => {
+        console.log(err);
+        this.setState({message: err.message})
+      });
+  }
+
+  handleCreateNewDevice = name => {
+    if (!name) {
+      this.setState({message: 'Incorrect new device name'});
+    }
+    else {
+      const {user} = this.state;
+      api.createNewDevice(user._id, this.state.session_token, name)
+        .then(device => {
+          const devices = [...user.devices, device];
+          const newUser = {...user, devices};
+          this.setState({user: newUser});
+        })
+        .catch(err => {
+          this.setState({message: err.message || err});
+        });
+    }
   }
 
   setErrorMessage = message => this.setState({message});
@@ -85,7 +106,8 @@ class App extends Component {
             user={user}
             onLogin={this.handlerLogin}
             setErrorMessage={this.setErrorMessage}
-            onSubmitRegistrateForm={this.handleSubmitRegistrateForm}/>
+            onSubmitRegistrateForm={this.handleSubmitRegistrateForm}
+            onCreateNewDevice={this.handleCreateNewDevice}/>
         </div>
       </div>
     );

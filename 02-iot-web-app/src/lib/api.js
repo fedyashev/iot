@@ -71,6 +71,40 @@ const api = {
                 }
                 return res.json();
             });
+    },
+
+    getDeviceList: (user_id, session_token) => {
+        const opt = {
+            method: 'GET',
+        };
+        const url = `/api/v1/user/${user_id}/device?session_token=${session_token}`;
+        return fetch(url, opt)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(res.message || res.statusText);
+                }
+                return res.json();
+            });
+
+    },
+
+    createNewDevice: (user_id, session_token, name) => {
+        const data = {name, session_token};
+        const opt = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        const url = `/api/v1/user/${user_id}/device`;
+        return fetch(url, opt)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(res.statusText);
+                }
+                return res.json();
+            });
     }
 };
 

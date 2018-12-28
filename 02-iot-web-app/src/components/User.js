@@ -1,10 +1,11 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
 
 const User = props => {
     const {user} = props;
     return (
         <div className="row justify-content-center">
-            <div className='col-6'>
+            <div className='col'>
                 {
                     user ?
                         (
@@ -12,7 +13,9 @@ const User = props => {
                                 <li className="list-group-item ">{`Username: ${user.username}`}</li>
                                 <li className="list-group-item">{`Email: ${user.email}`}</li>
                                 <li className="list-group-item">{`data_token: ${user.data_token}`}</li>
-                                <li className="list-group-item">{`Devices: ${user.devices.length}`}</li>
+                                <li className="list-group-item">
+                                    <span><Link to='/device'>Devices</Link> {user.devices.length}</span>
+                                </li>
                             </ul>
                         ):
                         (

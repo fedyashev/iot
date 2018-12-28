@@ -13,7 +13,9 @@ const Header = props => {
     return (
         <header className="mb-3">
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark rounded-bottom">
-                <span className="navbar-brand">IoT</span>
+                <span >
+                    <Link className="navbar-brand" to={user ? '/user' : '/login'}>IoT</Link>
+                </span>
                 <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
@@ -23,10 +25,20 @@ const Header = props => {
                             (
                                 <ul className="navbar-nav">
                                     <li className="nav-item">
-                                        <Link className="nav-link" to='/logout' onClick={onClickLogout}>Logout</Link>
+                                        <Link className="nav-link" to={`/device`}>Devices</Link>
                                     </li>
                                     <li className="nav-item">
-                                        <Link className="nav-link" to={`/user`}>{user.username}</Link>
+                                        <Link className="nav-link" to={`/data`}>Data</Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to={`/user`}>
+                                            <span className="text-warning font-weight-bold">
+                                                {user.username}
+                                            </span>
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to='/logout' onClick={onClickLogout}>Logout</Link>
                                     </li>
                                 </ul>
                             ) :
