@@ -10,8 +10,9 @@ const User = props => {
                     user ?
                         (
                             <ul className="list-group">
-                                <li className="list-group-item ">{`Username: ${user.username}`}</li>
-                                <li className="list-group-item">{`Email: ${user.email}`}</li>
+                                <li className="list-group-item">{`user_id: ${user._id}`}</li>
+                                <li className="list-group-item">{`username: ${user.username}`}</li>
+                                <li className="list-group-item">{`email: ${user.email}`}</li>
                                 <li className="list-group-item">{`data_token: ${user.data_token}`}</li>
                                 <li className="list-group-item">
                                     <span><Link to='/device'>Devices</Link> {user.devices.length}</span>

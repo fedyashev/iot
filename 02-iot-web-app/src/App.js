@@ -30,16 +30,20 @@ class App extends Component {
           api.getUserById(user_id, session_token)
             .then(user => {
               this.setState({user, session_token}, () => {
-                this.props.history.push('/user');
+                this.props.history.push('/data');
               })
             })
-            .catch(err => this.setState({message: err.message}));
+            .catch(err => {
+              this.setState({message: err.message});
+            });
         }
         else {
           throw new Error('Incorrect response data');
         }
       })
-      .catch(err => this.setState({message: err.message}));
+      .catch(err => {
+        this.setState({message: err.message});
+      });
   }
 
   handlerLogout = () => {
@@ -68,7 +72,6 @@ class App extends Component {
         })
       })
       .catch(err => {
-        console.log(err);
         this.setState({message: err.message})
       });
   }
@@ -83,15 +86,103 @@ class App extends Component {
         .then(device => {
           const devices = [...user.devices, device];
           const newUser = {...user, devices};
-          this.setState({user: newUser});
+          this.setState({user: newUser, message: `Device ${name} created.`});
         })
         .catch(err => {
-          this.setState({message: err.message || err});
+          this.setState({message: err.message});
         });
     }
   }
 
+  handleDeleteDevice = (device_id, isSubmit) => {
+    if (isSubmit) {
+      const {user, session_token} = this.state;
+      api.deleteDevice(user._id, device_id, session_token)
+        .then(res => {
+          const devices = [...user.devices].filter(d => d._id !== device_id);
+          const newUser = {...user, devices};
+          this.props.history.push('/device');
+          this.setState({user: newUser, message: 'Device deleted'});
+        })
+        .catch(err => this.setState({message: err.message}));
+    }
+    else {
+      this.props.history.goBack();
+    }
+
+  }
+
   setErrorMessage = message => this.setState({message});
+
+  isAuthenticated = () => this.state.session_token != null;
+
+  handleCreateNewSensor = (device_id, name, units) => {
+    if (!device_id || !name || !units) {
+      this.setState({message: 'Incorrect sensor name or units'});
+    }
+    else {
+      const {user, session_token} = this.state;
+      const user_id = user._id;
+      api.createNewSensor(user_id, device_id, session_token, name, units)
+        .then(sensor => {
+          const newUser = {...user};
+          newUser.devices.find(d => d._id === device_id).sensors.push(sensor);
+          this.setState({...this.state, user: newUser, message: 'Sensor created'}, () => {
+            this.props.history.push(`/device/${device_id}`);
+          });
+        })
+        .catch(err => this.setState({message: err.message}));
+    }
+  }
+
+  handleRenameDevice = (device_id, name) => {
+    const {user, session_token} = this.state;
+    api.renameDevice(user._id, device_id, session_token, name)
+      .then(device => {
+        const newUser = {...user};
+        newUser.devices.find(d => d._id === device_id).name = device.name;
+        this.props.history.goBack();
+        this.setState({...this.state, user: newUser, message: 'Device renamed'});
+      })
+      .catch(err => this.setState({...this.state, message: err.message}));
+  }
+
+  handleEditSensor = (device_id, sensor_id, name, units) => {
+    const {user, session_token} = this.state;
+    api.editSensor(user._id, device_id, sensor_id, session_token, name, units)
+      .then(newSensor => {
+        const newUser = {...user};
+        const sensor = newUser
+          .devices.find(d => d._id === device_id)
+          .sensors.find(s => s._id === sensor_id);
+        sensor.name = newSensor.name;
+        sensor.units = newSensor.units;
+        this.props.history.goBack();
+        this.setState({...this.state, user: newUser, message: 'Sensor updated'});
+      })
+      .catch(err => this.setState({...this.state, message: err.message}));
+  }
+
+  handleDeleteSensor = (device_id, sensor_id, isSubmit) => {
+    if (isSubmit) {
+      const {user, session_token} = this.state;
+      api.deleteSensor(user._id, device_id, sensor_id, session_token)
+        .then(result => {
+          const newUser = {...user};
+          const sensors = newUser
+            .devices.find(d => d._id === device_id)
+            .sensors.filter(s => s._id !== sensor_id);
+          const device = newUser.devices.find(d => d._id === device_id);
+          device.sensors = sensors;
+          this.props.history.push(`/device/${device_id}`);
+          this.setState({...this.state, user: newUser, message: 'Sensor deleted'});
+        })
+        .catch(err => this.setState({...this.state, message: err.message}));
+    }
+    else {
+      this.props.history.goBack();
+    }
+  }
 
   render() {
     const {user, message} = this.state;
@@ -104,10 +195,16 @@ class App extends Component {
           }
           <Main
             user={user}
+            isAuthenticated={this.isAuthenticated}
             onLogin={this.handlerLogin}
             setErrorMessage={this.setErrorMessage}
             onSubmitRegistrateForm={this.handleSubmitRegistrateForm}
-            onCreateNewDevice={this.handleCreateNewDevice}/>
+            onCreateNewDevice={this.handleCreateNewDevice}
+            onDeleteDevice={this.handleDeleteDevice}
+            onCreateSensor={this.handleCreateNewSensor}
+            onRenameDevice={this.handleRenameDevice}
+            onEditSensor={this.handleEditSensor}
+            onDeleteSensor={this.handleDeleteSensor}/>
         </div>
       </div>
     );

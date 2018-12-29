@@ -6,8 +6,8 @@ const DataSchema = new Schema({
     value: {type: Number, required: true}
 });
 
-const Data = senror_id => {
-    const model = mongoose.model(`Sensor_${senror_id}_data`, DataSchema)
+const Data = sensor_id => {
+    const model = mongoose.model(`Sensor_${sensor_id}_data`, DataSchema)
 
     model.getLastData = function() {
         return this

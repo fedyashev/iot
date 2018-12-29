@@ -57,7 +57,12 @@ module.exports.updateDeviceInfo = (req, res, next) => {
     const {user_id, device_id} = req.params;
     const {name} = req.body;
     User.findById({_id: user_id})
-        .populate('devices')
+        .populate({
+            path: 'devices',
+            populate: {
+                path: 'sensors'
+            }
+        })
         .then(user => {            
             if (user) {
                 const device = user.devices.find(d => d._id === device_id);

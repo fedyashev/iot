@@ -43,6 +43,7 @@ app.use('/api/v1', api_v1);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
+  //console.log(err);
   next(createError(err.status || 404));
   //res.status(404).json({error: 'Resource not found'});
 });
@@ -55,6 +56,7 @@ app.use(function(err, req, res, next) {
   // render the error page
   //res.status(err.status || 500);
   //res.render('error');
+  //console.log(err);
   res.status(err.status || 500).json(err);
 });
 

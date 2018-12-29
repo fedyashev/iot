@@ -1,16 +1,6 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
 
-const DeviceListItem = props => {
-    const {name, sensors} = props.device;
-    return (
-        <ul className="list-group mb-3">
-            <li className="list-group-item list-group-item-dark">{name}</li>
-            {
-                sensors.length > 0 && sensors.map(sensor => <li key={sensor._id} className="list-group-item">{sensor.name}</li>)
-            } 
-        </ul>
-    );
-};
 
 const CreateDeviceForm = props => {
     const {onCreateNewDevice} = props;
@@ -30,15 +20,59 @@ const CreateDeviceForm = props => {
     );
 }
 
+const DeviceTableRow = props => {
+    const {device} = props;
+    return(
+        <tr>
+            <td>
+                <Link to={`/device/${device._id}`}>{device.name}</Link>
+            </td>
+            <td className="text-center">{device.sensors.length}</td>
+            <td className="text-center">
+                <div className="dropdown ml-auto">
+                    <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" id={`dropdownMenu-device-${device._id}`} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Action
+                    </button>
+                    <div className="dropdown-menu dropdown-menu-right" aria-labelledby={`dropdownMenu-device-${device._id}`}>
+                        <Link to={`/device/${device._id}/createSensor`} className="dropdown-item">Add sensor</Link>
+                        <Link to={`/device/${device._id}/renameDevice`} className="dropdown-item">Rename</Link>                        
+                        <Link to={`/device/${device._id}/deleteDevice`} className="dropdown-item">Delete</Link>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    );
+};
+
+const DeviceTable = props => {
+    const {user} = props;
+    return (
+        <table className="table table-bordered table-hover table-sm">
+            <thead className="thead-dark">
+                <tr>
+                    <th scope="col" className="text-center">Device</th>
+                    <th scope="col" className="text-center">Sensors</th>
+                    <th scope="col" className="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody style={{fontSize: '0.85rem'}}>
+                {
+                    user && user.devices && user.devices.map(
+                        device => <DeviceTableRow key={device._id} device={device}/>
+                    )
+                }
+            </tbody>
+        </table>
+    );
+}
+
 const DeviceList = props => {
     const {user, onCreateNewDevice} = props;
     return (
         <div>
             <CreateDeviceForm onCreateNewDevice={onCreateNewDevice}/>
             {
-                user && user.devices ? 
-                    user.devices.map(device => <DeviceListItem key={device._id} device={device}/>) :
-                    <h1 className="h1 text-secondary text-center">Empty</h1>
+                user && <DeviceTable user={user}/>
             }
         </div>
     );

@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const shortid = require('shortid');
+const mongoose = require('mongoose');
 
 const User = require('../models/User');
 const Device = require('../models/Device');
@@ -154,11 +155,22 @@ module.exports.deleteSensorById = (req, res, next) => {
                     .then(updatedDevice => {
                         Sensor.deleteOne({_id: sensor_id})
                             .then(result => {
-                                Data(sensor_id)
-                                    .collection
-                                    .drop()
-                                    .then(result => res.json({sensor_id, deleted: true}))
-                                    .catch(err => next(createError(500, err.message)))
+                                mongoose.connection.db.listCollections({name: `Sensor_${sensor_id}_data`})
+                                    .next((err, col) => {
+                                        if (err) {
+                                            next(createError(500, err.message));
+                                        }
+                                        if (col) {
+                                            Data(sensor_id)
+                                                .collection
+                                                .drop()
+                                                .then(result => res.json({sensor_id, deleted: true}))
+                                                .catch(err => next(createError(500, err.message)))                                            
+                                        }
+                                        else {
+                                            res.json({sensor_id, deleted: true});
+                                        }
+                                    })
                             })
                             .catch(err => next(createError(500, err.message || 'Sensor delete error')));
                     })

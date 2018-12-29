@@ -43,7 +43,7 @@ module.exports.registrate = (req, res, next) => {
 module.exports.login = (req, res, next) => {
     const {username, password} = req.body;
     //const loginError = {error: 'Incorrect login or password'};
-    const loginError = new Error('Incorrect login or password');
+    //const loginError = new Error('Incorrect login or password');
     User.findOne({username})
         .then(user => {
             comparePassword(password, user.passwordHash, (err, isPasswordMatch) => {
@@ -68,18 +68,17 @@ module.exports.login = (req, res, next) => {
                                             session_token: session.session_token
                                         });
                                     })
-                                    .catch(err => res.json(500, err));
+                                    .catch(err => next(createError(500, err.message)));
                             }
                         })
-                        .catch(err => res.json(500, err));
-                    //res.json({user_id: user._id});
+                        .catch(err => next(createError(500, err.message)));
                 }
                 else {
-                    res.json(400, loginError);
+                    next(createError(400, 'Incorrect login or password'))
                 }
             });
         })
-        .catch(err => res.status(400).json(loginError));
+        .catch(err => next(createError(400, 'Incorrect login or password')));
 };
 
 module.exports.logout = (req, res, next) => {
