@@ -124,7 +124,7 @@ module.exports.setDeviceSensorsData = (req, res, next) => {
                                     .save()
                                     .then(sensor => {
                                         i--;
-                                        if (i) {
+                                        if (!i) {
                                             res.json({done: true});
                                         }
                                     })

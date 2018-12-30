@@ -21,8 +21,8 @@ mongoose
   });
 
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+//var indexRouter = require('./routes/index');
+//var usersRouter = require('./routes/users');
 const api_v1 = require('./routes/api-v1');
 
 var app = express();

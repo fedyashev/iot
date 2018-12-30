@@ -58,8 +58,9 @@ class App extends Component {
     //     });
     //   })
     //   .catch(err => this.setState({message: err.message}));
-    this.setState({});
-    this.props.history.push('/login');
+    
+    this.setState({user: null, session_token: null, message: null});
+    this.props.history.push('/login');    
   }
 
   handlerAlertClose = () => this.setState({message: null});
