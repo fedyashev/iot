@@ -182,3 +182,50 @@ module.exports.deleteSensorById = (req, res, next) => {
         })
         .catch(err => next(createError(500, err.message || 'User collection error')));
 }
+
+module.exports.deleteSensorDataById = (req, res, next) => {
+    const {user_id, device_id, sensor_id} = req.param;
+    if (!shortid.isValid(user_id) || !shortid.isValid(device_id) || !shortid.isValid(sensor_id)) {
+        next(createError(404, 'Resource not found'));
+    }
+
+    User.findById({_id: user_id})
+        .populate({
+            path: 'devices',
+            populate: {
+                path: 'sensors'
+            }
+        })
+        .then(user => {
+            if (user) {
+                const sensor = user
+                    .devices.find(d => d._id === device_id)
+                    .sensors.find(s => s._id === sensor_id);
+                if (sensor) {
+                    sensor.lastData = null;
+                    mongoose.connection.db.listCollections({name: `Sensor_${sensor_id}_data`})
+                        .next((err, col) => {
+                            if (err) {
+                                next(createError(500, err.message));
+                            }
+                            if (col) {
+                                Data(sensor_id)
+                                    .deleteMany({})
+                                    .then(result => res.json({sensor_id, cleared: true}))
+                                    .catch(err => next(createError(500, err.message)))                                            
+                            }
+                            else {
+                                res.json({sensor_id, cleared: true});
+                            }
+                        })
+                }
+                else {
+                    next(createError(404, 'Sensor not found'));
+                }
+            }
+            else {
+                next(createError(404, 'User not found'));
+            }
+        })
+        .catch(err => next(createError(500, err.message)))
+}

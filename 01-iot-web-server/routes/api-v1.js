@@ -82,6 +82,7 @@ router.put('/user/:user_id/device/:device_id/sensor/:sensor_id', session.isUserL
 // /api/v1/user/:user_uid/device/:device_uid/sensor/:sensor_uid
 //      DELETE  - delete sensor
 router.delete('/user/:user_id/device/:device_id/sensor/:sensor_id', session.isUserLogged, sensor.deleteSensorById);
+router.delete('/user/:user_id/device/:device_id/sensor/:sensor_id/clearData', session.isUserLogged, sensor.deleteSensorDataById);
 
 // /data/:user_id/:device_id?data_token=XXX
 //      GET     - get last data from all device sensors 
