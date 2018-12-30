@@ -203,21 +203,25 @@ module.exports.deleteSensorDataById = (req, res, next) => {
                     .sensors.find(s => s._id === sensor_id);
                 if (sensor) {
                     sensor.lastData = null;
-                    mongoose.connection.db.listCollections({name: `Sensor_${sensor_id}_data`})
-                        .next((err, col) => {
-                            if (err) {
-                                next(createError(500, err.message));
-                            }
-                            if (col) {
-                                Data(sensor_id)
-                                    .deleteMany({})
-                                    .then(result => res.json({sensor_id, cleared: true}))
-                                    .catch(err => next(createError(500, err.message)))                                            
-                            }
-                            else {
-                                res.json({sensor_id, cleared: true});
-                            }
+                    sensor.save()
+                        .then(result => {
+                            mongoose.connection.db.listCollections({name: `Sensor_${sensor_id}_data`})
+                                .next((err, col) => {
+                                    if (err) {
+                                        next(createError(500, err.message));
+                                    }
+                                    if (col) {
+                                        Data(sensor_id)
+                                            .deleteMany({})
+                                            .then(result => res.json({sensor_id, cleared: true}))
+                                            .catch(err => next(createError(500, err.message)))                                            
+                                    }
+                                    else {
+                                        res.json({sensor_id, cleared: true});
+                                    }
+                                })
                         })
+                        .catch(err => next(createError(500, err.message)));
                 }
                 else {
                     next(createError(404, 'Sensor not found'));

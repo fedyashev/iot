@@ -98,6 +98,7 @@ module.exports.getSensorData = (req, res, next) => {
         .catch(err => next(createError(500, err.message)));
 };
 
+// Main saving data function
 module.exports.setDeviceSensorsData = (req, res, next) => {
     const {user_id, device_id} = req.params;
     const {data} = req.body;
@@ -118,17 +119,33 @@ module.exports.setDeviceSensorsData = (req, res, next) => {
                 data.forEach(el => {
                     const sensor = device.sensors.find(s => s._id === el.sid);
                     if (sensor) {
-                        Data(el.sid).create({value: el.v})
-                            .then(data => {
-                                sensor.set({lastData: data})
-                                    .save()
-                                    .then(sensor => {
-                                        i--;
-                                        if (!i) {
-                                            res.json({done: true});
-                                        }
-                                    })
-                                    .catch(err => next(createError(500, err.message)));
+                        const oldData = sensor.lastData;
+                        const data = new Data(el.sid)({value: el.value});
+                        sensor.set({lastData: data})
+                            .save()
+                            .then(s => {
+                                if (oldData && oldData.date.getHours() !== data.date.getHours()) {
+                                    data.save()
+                                        .then(data => {})
+                                        .catch(err => next(createError(500, err.message)));
+                                    // Data(el.sid).create({value: el.v})
+                                    //     .then(data => {
+                                    //         sensor.set({lastData: data})
+                                    //             .save()
+                                    //             .then(sensor => {
+                                    //                 i--;
+                                    //                 if (!i) {
+                                    //                     res.json({done: true});
+                                    //                 }
+                                    //             })
+                                    //             .catch(err => next(createError(500, err.message)));
+                                    //     })
+                                    //     .catch(err => next(createError(500, err.message)));
+                                }
+                                i--;
+                                if (i == 0) {
+                                    res.json({done: true});
+                                }
                             })
                             .catch(err => next(createError(500, err.message)));
                     }

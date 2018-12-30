@@ -14,7 +14,8 @@ class App extends Component {
     this.state = {
       user: null,
       session_token: null,
-      message: null
+      message: null,
+      isLoading: false
     }
   }
 
@@ -59,23 +60,21 @@ class App extends Component {
     //   })
     //   .catch(err => this.setState({message: err.message}));
     
-    this.setState({user: null, session_token: null, message: null});
+    this.setState({user: null, session_token: null, message: null, isLoading: false});
     this.props.history.push('/login');    
   }
 
   handlerAlertClose = () => this.setState({message: null});
 
-  //handleMessageClose = () => this.setState({message: null});
-
   handleSubmitRegistrateForm = (username, password, email) => {
     api.registrate(username, password, email)
       .then(res => {
-        this.setState({message: 'Registration success.'}, () => {
+        this.setState({...this.state, message: 'Registration success'}, () => {
           this.props.history.push('/login');
         })
       })
       .catch(err => {
-        this.setState({message: err.message})
+        this.setState({...this.state, message: err.message})
       });
   }
 
