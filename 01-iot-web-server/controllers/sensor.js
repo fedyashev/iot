@@ -184,7 +184,7 @@ module.exports.deleteSensorById = (req, res, next) => {
 }
 
 module.exports.deleteSensorDataById = (req, res, next) => {
-    const {user_id, device_id, sensor_id} = req.param;
+    const {user_id, device_id, sensor_id} = req.params;
     if (!shortid.isValid(user_id) || !shortid.isValid(device_id) || !shortid.isValid(sensor_id)) {
         next(createError(404, 'Resource not found'));
     }
@@ -202,24 +202,15 @@ module.exports.deleteSensorDataById = (req, res, next) => {
                     .devices.find(d => d._id === device_id)
                     .sensors.find(s => s._id === sensor_id);
                 if (sensor) {
-                    sensor.lastData = null;
-                    sensor.save()
+                    Sensor.updateOne({_id: sensor_id}, {$set: {lastData: null}})
                         .then(result => {
-                            mongoose.connection.db.listCollections({name: `Sensor_${sensor_id}_data`})
-                                .next((err, col) => {
-                                    if (err) {
-                                        next(createError(500, err.message));
-                                    }
-                                    if (col) {
-                                        Data(sensor_id)
-                                            .deleteMany({})
-                                            .then(result => res.json({sensor_id, cleared: true}))
-                                            .catch(err => next(createError(500, err.message)))                                            
-                                    }
-                                    else {
-                                        res.json({sensor_id, cleared: true});
-                                    }
+                            console.log(result);
+                            Data(sensor_id)
+                                .deleteMany({})
+                                .then(result => {
+                                    res.json({sensor_id, cleared: true});
                                 })
+                                .catch(err => next(createError(err.message)));
                         })
                         .catch(err => next(createError(500, err.message)));
                 }

@@ -5,6 +5,8 @@ const Data = require('../models/Data');
 
 const createError = require('http-errors');
 
+const mongoose = require('mongoose');
+
 
 module.exports.setSensorDataById = (req, res, next) => {
     const {user_id, device_id, sensor_id} = req.params;
@@ -119,33 +121,31 @@ module.exports.setDeviceSensorsData = (req, res, next) => {
                 data.forEach(el => {
                     const sensor = device.sensors.find(s => s._id === el.sid);
                     if (sensor) {
-                        const oldData = sensor.lastData;
-                        const data = new Data(el.sid)({value: el.value});
-                        sensor.set({lastData: data})
-                            .save()
-                            .then(s => {
-                                if (oldData && oldData.date.getHours() !== data.date.getHours()) {
-                                    data.save()
-                                        .then(data => {})
-                                        .catch(err => next(createError(500, err.message)));
-                                    // Data(el.sid).create({value: el.v})
-                                    //     .then(data => {
-                                    //         sensor.set({lastData: data})
-                                    //             .save()
-                                    //             .then(sensor => {
-                                    //                 i--;
-                                    //                 if (!i) {
-                                    //                     res.json({done: true});
-                                    //                 }
-                                    //             })
-                                    //             .catch(err => next(createError(500, err.message)));
-                                    //     })
-                                    //     .catch(err => next(createError(500, err.message)));
-                                }
-                                i--;
-                                if (i == 0) {
-                                    res.json({done: true});
-                                }
+                        Sensor.findById({_id: el.sid})
+                            .then(sensor => {
+                                const lastData = sensor.lastData ? {date: sensor.lastData.date, value: sensor.lastData.value} : null;
+                                const DataModel = Data(el.sid);
+                                const newData = new DataModel({value: el.v});
+                                Sensor.updateOne({_id: el.sid}, {$set: {lastData: newData}})
+                                    .then(sensor => {
+                                        if (lastData && lastData.date) {
+                                            if (lastData.date.getHours() !== newData.date.getHours()) {
+                                                newData.save()
+                                                    .then(savedData => {console.log(savedData)})
+                                                    .catch(err => next(createError(500, err.message)));
+                                            }
+                                        }
+                                        else {
+                                            newData.save()
+                                                .then(savedData => {console.log(savedData)})
+                                                .catch(err => next(createError(500, err.message)));
+                                        }
+                                        i--;
+                                        if (i == 0) {
+                                            res.json({done: true});
+                                        }
+                                    })
+                                    .catch(err => next(createError(500, err.message)));
                             })
                             .catch(err => next(createError(500, err.message)));
                     }
