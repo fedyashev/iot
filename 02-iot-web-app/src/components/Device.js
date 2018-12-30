@@ -36,7 +36,15 @@ const DeviceInfo = props => {
 };
 
 const DeviceSensorsTable = props => {
-    const {device} = props;
+    const {device, onRefreshSensorData, onRefreshDeviceData} = props;
+    const onClickRefreshSensorData = (device_id, sensor_id) => e => {
+        e.preventDefault();
+        onRefreshSensorData(device_id, sensor_id);
+    }
+    const onClickRefreshDeviceData = e => {
+        e.preventDefault();
+        onRefreshDeviceData(device._id);
+    }
     return (
         <div className="table-responsive">
             <p className="h3 text-center mb-1">Sensors list</p>
@@ -44,7 +52,7 @@ const DeviceSensorsTable = props => {
                 <thead className="thead-dark">
                     <tr>
                         <th scope="col" className="text-center">
-                            <button className="btn btn-sm btn-secondary p-2">{' '}</button>
+                            <button className="btn btn-sm btn-secondary p-2" onClick={onClickRefreshDeviceData}>{' '}</button>
                         </th>
                         <th scope="col" className="text-center">Name</th>
                         <th scope="col" className="text-center">Units</th>
@@ -57,7 +65,7 @@ const DeviceSensorsTable = props => {
                         device && device.sensors.map(sensor => 
                             <tr key={sensor._id}>
                                 <td className="text-center">
-                                    <button className="btn btn-sm btn-secondary p-2">{' '}</button>
+                                    <button className="btn btn-sm btn-secondary p-2" onClick={onClickRefreshSensorData(device._id, sensor._id)}>{' '}</button>
                                 </td>
                                 <td className="text-center">
                                     <Link to={`/device/${device._id}/sensor/${sensor._id}`}>{sensor.name}</Link>
@@ -75,12 +83,11 @@ const DeviceSensorsTable = props => {
 };
 
 const Device = props => {
-    const {device} = props;
     return (
         <section>
-            <DeviceNav device={device}/>
-            <DeviceInfo device={device}/>
-            <DeviceSensorsTable device={device}/>
+            <DeviceNav {...props}/>
+            <DeviceInfo {...props}/>
+            <DeviceSensorsTable {...props}/>
         </section>
     );
 };

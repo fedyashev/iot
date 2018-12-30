@@ -3,10 +3,16 @@ import {Link} from 'react-router-dom';
 
 const SensorNav = props => {
     const {device_id, sensor_id} = props.match.params;
+    const {onRefreshSensorData} = props;
+    const onClickRefreshSensorData = (device_id, sensor_id) => e => {
+        e.preventDefault();
+        onRefreshSensorData(device_id, sensor_id);
+    }
     return (
         <nav className="nav mb-2">
             <Link to={`/device/${device_id}/sensor/${sensor_id}/editSensor`} className="nav-link">Edit</Link>
             <Link to={`/device/${device_id}/sensor/${sensor_id}/deleteSensor`} className="nav-link">Delete</Link>
+            <Link to={''} className="nav-link" onClick={onClickRefreshSensorData(device_id, sensor_id)}>Refresh</Link>
         </nav>
     );
 };

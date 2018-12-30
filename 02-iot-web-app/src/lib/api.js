@@ -178,6 +178,30 @@ const api = {
                 const promise = res.json();
                 return res.ok ? promise : promise.then(err => {throw new Error(err.message)});
             });
+    },
+
+    getSensorInfoById: (user_id, device_id, sensor_id, session_token) => {
+        const opt = {
+            method: 'GET'
+        };
+        const url = `/api/v1/user/${user_id}/device/${device_id}/sensor/${sensor_id}?session_token=${session_token}`;
+        return fetch(url, opt)
+            .then(res => {
+                const promise = res.json();
+                return res.ok ? promise : promise.then(err => {throw new Error(err.message)});
+            });
+    },
+
+    getDeviceInfoById: (user_id, device_id, session_token) => {
+        const opt = {
+            method: 'GET'
+        };
+        const url = `/api/v1/user/${user_id}/device/${device_id}?session_token=${session_token}`;
+        return fetch(url, opt)
+            .then(res => {
+                const promise = res.json();
+                return res.ok ? promise : promise.then(err => {throw new Error(err.message)});
+            });
     }
 };
 

@@ -28,7 +28,10 @@ const Main = props => {
         onCreateSensor,
         onRenameDevice,
         onEditSensor,
-        onDeleteSensor
+        onDeleteSensor,
+        onRefreshAllData,
+        onRefreshSensorData,
+        onRefreshDeviceData
     } = props;
     return (
         <main>
@@ -39,10 +42,10 @@ const Main = props => {
                         onSubmitRegistrateForm={onSubmitRegistrateForm}
                         setErrorMessage={setErrorMessage}/>
                 }/>
-                <Route exact path='/data' render={props => <Data {...props} user={user} />}/>
+                <Route exact path='/data' render={props => <Data {...props} user={user} onRefreshAllData={onRefreshAllData} onRefreshSensorData={onRefreshSensorData}/>}/>
                 <Route exact path='/user' render={props => <User {...props} user={user}/>}/>
                 <Route exact path='/device' render={props => <DeviceList {...props} user={user} onCreateNewDevice={onCreateNewDevice}/>}/>
-                <Route exact path='/device/:device_id' render={props => user && <Device {...props} device={user.devices.find(d => d._id === props.match.params.device_id)}/>}/>
+                <Route exact path='/device/:device_id' render={props => user && <Device {...props} device={user.devices.find(d => d._id === props.match.params.device_id)} onRefreshSensorData={onRefreshSensorData} onRefreshDeviceData={onRefreshDeviceData}/>}/>
                 <Route exact path='/device/:device_id/createSensor' render={props => user && <SensorCreate {...props} onCreateSensor={onCreateSensor}/>}/>
                 <Route exact path='/device/:device_id/deleteDevice' render={props => user && <DeviceDelete {...props} device={user.devices.find(d => d._id === props.match.params.device_id)} onDeleteDevice={onDeleteDevice}/>}/>
                 <Route exact path='/device/:device_id/renameDevice' render={props => user && <DeviceRename {...props} device={user.devices.find(d => d._id === props.match.params.device_id)} onRenameDevice={onRenameDevice}/>}/>
@@ -53,6 +56,7 @@ const Main = props => {
                                 .devices.find(d => d._id === props.match.params.device_id)
                                 .sensors.find(s => s._id === props.match.params.sensor_id)
                         }
+                        onRefreshSensorData={onRefreshSensorData}
                     />
                 }/>
                 <Route exact path='/device/:device_id/sensor/:sensor_id/editSensor' render={props => user &&

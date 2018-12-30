@@ -47,17 +47,19 @@ class App extends Component {
   }
 
   handlerLogout = () => {
-    if (!this.state.user || !this.state.session_token) return;
-    const user_id = this.state.user._id;
-    const session_token = this.state.session_token;
-    api.logout(user_id, session_token)
-      .then(res => {
-        console.log(res);
-        this.setState({user: null, session_token: null}, () => {
-          this.props.history.push('/login');
-        });
-      })
-      .catch(err => this.setState({message: err.message}));
+    // if (!this.state.user || !this.state.session_token) return;
+    // const user_id = this.state.user._id;
+    // const session_token = this.state.session_token;
+    // api.logout(user_id, session_token)
+    //   .then(res => {
+    //     console.log(res);
+    //     this.setState({user: null, session_token: null}, () => {
+    //       this.props.history.push('/login');
+    //     });
+    //   })
+    //   .catch(err => this.setState({message: err.message}));
+    this.setState({});
+    this.props.history.push('/login');
   }
 
   handlerAlertClose = () => this.setState({message: null});
@@ -184,6 +186,37 @@ class App extends Component {
     }
   }
 
+  handlerRefreshAllData = () => {
+    const {user, session_token} = this.state;
+    api.getUserById(user._id, session_token)
+      .then(user => this.setState({user, session_token}))
+      .catch(err => this.setState({...this.state, message: err.message}));
+  }
+
+  handleRefreshSensorData = (device_id, sensor_id) => {
+    const {user, session_token} = this.state;
+    api.getSensorInfoById(user._id, device_id, sensor_id, session_token)
+      .then(sensor => {
+        const newUser = {...user};
+        const device = newUser.devices.find(d => d._id === device_id);
+        const sensors = device.sensors.map(s => s._id === sensor_id ? sensor : s);
+        device.sensors = sensors;
+        this.setState({...this.state, user: newUser});
+      })
+      .catch(err => this.setState({...this.state, message: err.message}));
+  }
+
+  handleRefreshDeviceData = device_id => {
+    const {user, session_token} = this.state;
+    api.getDeviceInfoById(user._id, device_id, session_token)
+      .then(device => {
+        const devices = user.devices.map(d => d._id === device_id ? device : d);
+        const newUser = {...user, devices};
+        this.setState({...this.state, user: newUser});
+      })
+      .catch(err => this.setState({...this.state, message: err.message}));
+  }
+
   render() {
     const {user, message} = this.state;
     return (
@@ -204,7 +237,10 @@ class App extends Component {
             onCreateSensor={this.handleCreateNewSensor}
             onRenameDevice={this.handleRenameDevice}
             onEditSensor={this.handleEditSensor}
-            onDeleteSensor={this.handleDeleteSensor}/>
+            onDeleteSensor={this.handleDeleteSensor}
+            onRefreshAllData={this.handlerRefreshAllData}
+            onRefreshSensorData={this.handleRefreshSensorData}
+            onRefreshDeviceData={this.handleRefreshDeviceData}/>
         </div>
       </div>
     );

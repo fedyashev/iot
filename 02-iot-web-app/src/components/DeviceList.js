@@ -24,7 +24,7 @@ const DeviceTableRow = props => {
     const {device} = props;
     return(
         <tr>
-            <td>
+            <td className="text-center">
                 <Link to={`/device/${device._id}`}>{device.name}</Link>
             </td>
             <td className="text-center">{device.sensors.length}</td>

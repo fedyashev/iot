@@ -34,7 +34,12 @@ module.exports.createNewDevice = (req, res, next) => {
 module.exports.getDeviceInfoById = (req, res, next) => {
     const {user_id, device_id} = req.params;
     User.findById({_id: user_id})
-        .populate('devices')
+        .populate({
+            path: 'devices',
+            populate: {
+                path: 'sensors'
+            }
+        })
         .then(user => {
             if (user) {
                 const device = user.devices.find(d => d._id === device_id);
@@ -49,7 +54,7 @@ module.exports.getDeviceInfoById = (req, res, next) => {
                 next(createError(404, 'User not found'));
             }
         })
-        .catch(err => next(createError(500, err.message || 'User db error')));
+        .catch(err => next(createError(500, err.message)));
 };
 
 // Update device info
